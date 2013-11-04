@@ -1,0 +1,454 @@
+#include <Timer.h>
+#include "task415.h"
+#include "printf.h"
+module task415C{
+	uses interface Boot;
+	uses interface Leds;
+	uses interface Timer<TMilli> as Timer0;
+	uses interface Packet;
+	uses interface AMPacket;
+	uses interface AMSend;
+	uses interface SplitControl as AMControl;
+	uses interface Receive;
+}
+implementation{
+	bool busy=FALSE;
+	bool check=FALSE;
+	uint32_t counter=0;
+	message_t pkt;
+	am_addr_t x;
+	uint8_t hops=0;
+	int i=0;
+
+	event void Boot.booted(){
+		// TODO Auto-generated method stub
+		call AMControl.start();
+	}
+
+	event void AMControl.startDone(error_t error){
+		// TODO Auto-generated method stub
+		if(error==SUCCESS){
+	
+		}else{
+			call AMControl.start();
+		}
+	}
+
+
+	event void Timer0.fired(){
+	counter++;
+	call Leds.led0Toggle();
+		if(call AMSend.send(AM_BROADCAST_ADDR,&pkt, sizeof(task3CMsg))==SUCCESS){
+			call Leds.led0Toggle();			
+			}
+	}
+
+	event void AMControl.stopDone(error_t error){
+		// TODO Auto-generated method stub
+	}
+
+	event void AMSend.sendDone(message_t *msg, error_t error){
+		// TODO Auto-generated method stub
+		if(error==SUCCESS){
+			task3CMsg* btrpkt = (task3CMsg*)(call Packet.getPayload(&pkt, sizeof (task3CMsg)));						
+			busy=FALSE;
+			btrpkt->sourceid0=TOS_NODE_ID;
+			btrpkt->sourceid1=0;
+			btrpkt->sourceid2=0;
+			btrpkt->sourceid3=0;
+			btrpkt->sourceid4=0;
+			btrpkt->sourceid5=0;
+			btrpkt->sourceid6=0;
+			btrpkt->sourceid7=0;
+			btrpkt->sourceid8=0;
+			btrpkt->sourceid9=0;
+			btrpkt->sourceid10=0;
+			btrpkt->sourceid11=0;
+			btrpkt->sourceid12=0;
+			btrpkt->hopcnt=1;
+			btrpkt->counter0=counter;
+			btrpkt->counter1=0;
+			btrpkt->counter2=0;
+			btrpkt->counter3=0;
+			btrpkt->counter4=0;
+			btrpkt->counter5=0;
+			btrpkt->counter6=0;
+			btrpkt->counter7=0;
+			btrpkt->counter8=0;
+			btrpkt->counter9=0;
+			btrpkt->counter10=0;
+			btrpkt->counter11=0;
+			btrpkt->counter12=0;
+			hops=1;
+		}
+	}
+
+	event message_t * Receive.receive(message_t *msg, void *payload, uint8_t len){
+		// TODO Auto-generated method stub
+				
+		//Saving the packet and appending it
+		x=call AMPacket.source(msg);
+		if(x==16){		//16
+			task3CMsg* btrpkt = (task3CMsg*)(call Packet.getPayload(&pkt, sizeof (task3CMsg)));
+			call Leds.led2Toggle();
+			btrpkt->sourceid0=TOS_NODE_ID;
+			btrpkt->sourceid1=0;
+			btrpkt->sourceid2=0;
+			btrpkt->sourceid3=0;
+			btrpkt->sourceid4=0;
+			btrpkt->sourceid5=0;
+			btrpkt->sourceid6=0;
+			btrpkt->sourceid7=0;
+			btrpkt->sourceid8=0;
+			btrpkt->sourceid9=0;
+			btrpkt->sourceid10=0;
+			btrpkt->sourceid11=0;
+			btrpkt->sourceid12=0;
+			btrpkt->hopcnt=1;
+			btrpkt->counter0=counter;
+			btrpkt->counter1=0;
+			btrpkt->counter2=0;
+			btrpkt->counter3=0;
+			btrpkt->counter4=0;
+			btrpkt->counter5=0;
+			btrpkt->counter6=0;
+			btrpkt->counter7=0;
+			btrpkt->counter8=0;
+			btrpkt->counter9=0;
+			btrpkt->counter10=0;
+			btrpkt->counter11=0;
+			btrpkt->counter12=0;
+			hops=1;
+			call Timer0.startPeriodicAt(TOS_NODE_ID*TIMER_PERIOD_MILLI,15000);
+		}
+		else{
+			task3CMsg* btrpkt=(task3CMsg*) payload;
+			call Leds.led1Toggle();
+			if((TOS_NODE_ID-x)==1){
+				check=TRUE;
+			}else if((TOS_NODE_ID-x)==4){
+				check=TRUE;
+			}
+			if(check){
+				task3CMsg* reqd = (task3CMsg*)(call Packet.getPayload(&pkt, sizeof (task3CMsg)));
+				if(hops==1){//////IF HOPS then IF HOPCNTR
+					if(btrpkt->hopcnt==1){
+						reqd->sourceid1=btrpkt->sourceid0;
+						reqd->counter1=btrpkt->counter0;
+					}
+					else if(btrpkt->hopcnt==2){
+						reqd->sourceid1=btrpkt->sourceid0;
+						reqd->counter1=btrpkt->counter0;
+						reqd->sourceid2=btrpkt->sourceid1;
+						reqd->counter2=btrpkt->counter1;
+					}
+					else if(btrpkt->hopcnt==3){
+						reqd->sourceid1=btrpkt->sourceid0;
+						reqd->counter1=btrpkt->counter0;
+						reqd->sourceid2=btrpkt->sourceid1;
+						reqd->counter2=btrpkt->counter1;
+						reqd->sourceid3=btrpkt->sourceid2;
+						reqd->counter3=btrpkt->counter2;
+					}
+					else if(btrpkt->hopcnt==4){
+						reqd->sourceid1=btrpkt->sourceid0;
+						reqd->counter1=btrpkt->counter0;
+						reqd->sourceid2=btrpkt->sourceid1;
+						reqd->counter2=btrpkt->counter1;
+						reqd->sourceid3=btrpkt->sourceid2;
+						reqd->counter3=btrpkt->counter2;
+						reqd->sourceid4=btrpkt->sourceid3;
+						reqd->counter4=btrpkt->counter3;
+					}
+					else if(btrpkt->hopcnt==5){
+						reqd->sourceid1=btrpkt->sourceid0;
+						reqd->counter1=btrpkt->counter0;
+						reqd->sourceid2=btrpkt->sourceid1;
+						reqd->counter2=btrpkt->counter1;
+						reqd->sourceid3=btrpkt->sourceid2;
+						reqd->counter3=btrpkt->counter2;
+						reqd->sourceid4=btrpkt->sourceid3;
+						reqd->counter4=btrpkt->counter3;
+						reqd->sourceid5=btrpkt->sourceid4;
+						reqd->counter5=btrpkt->counter4;
+					}
+					else if(btrpkt->hopcnt==6){
+						reqd->sourceid1=btrpkt->sourceid0;
+						reqd->counter1=btrpkt->counter0;
+						reqd->sourceid2=btrpkt->sourceid1;
+						reqd->counter2=btrpkt->counter1;
+						reqd->sourceid3=btrpkt->sourceid2;
+						reqd->counter3=btrpkt->counter2;
+						reqd->sourceid4=btrpkt->sourceid3;
+						reqd->counter4=btrpkt->counter3;
+						reqd->sourceid5=btrpkt->sourceid4;
+						reqd->counter5=btrpkt->counter4;
+						reqd->sourceid6=btrpkt->sourceid5;
+						reqd->counter6=btrpkt->counter5;
+					}
+					else if(btrpkt->hopcnt==7){
+						reqd->sourceid1=btrpkt->sourceid0;
+						reqd->counter1=btrpkt->counter0;
+						reqd->sourceid2=btrpkt->sourceid1;
+						reqd->counter2=btrpkt->counter1;
+						reqd->sourceid3=btrpkt->sourceid2;
+						reqd->counter3=btrpkt->counter2;
+						reqd->sourceid4=btrpkt->sourceid3;
+						reqd->counter4=btrpkt->counter3;
+						reqd->sourceid5=btrpkt->sourceid4;
+						reqd->counter5=btrpkt->counter4;
+						reqd->sourceid6=btrpkt->sourceid5;
+						reqd->counter6=btrpkt->counter5;
+						reqd->sourceid7=btrpkt->sourceid6;
+						reqd->counter7=btrpkt->counter6;
+					}
+				}else if(hops==3){//////IF HOPS then IF HOPCNTR
+					if(btrpkt->hopcnt==1){
+						reqd->sourceid3=btrpkt->sourceid0;
+						reqd->counter3=btrpkt->counter0;
+					}
+					else if(btrpkt->hopcnt==2){
+						reqd->sourceid3=btrpkt->sourceid0;
+						reqd->counter3=btrpkt->counter0;
+						reqd->sourceid4=btrpkt->sourceid1;
+						reqd->counter4=btrpkt->counter1;
+					}
+					else if(btrpkt->hopcnt==3){
+						reqd->sourceid3=btrpkt->sourceid0;
+						reqd->counter3=btrpkt->counter0;
+						reqd->sourceid4=btrpkt->sourceid1;
+						reqd->counter4=btrpkt->counter1;
+						reqd->sourceid5=btrpkt->sourceid2;
+						reqd->counter5=btrpkt->counter2;
+					}
+					else if(btrpkt->hopcnt==4){
+						reqd->sourceid3=btrpkt->sourceid0;
+						reqd->counter3=btrpkt->counter0;
+						reqd->sourceid4=btrpkt->sourceid1;
+						reqd->counter4=btrpkt->counter1;
+						reqd->sourceid5=btrpkt->sourceid2;
+						reqd->counter5=btrpkt->counter2;
+						reqd->sourceid6=btrpkt->sourceid3;
+						reqd->counter6=btrpkt->counter3;
+					}
+					else if(btrpkt->hopcnt==5){
+						reqd->sourceid3=btrpkt->sourceid0;
+						reqd->counter3=btrpkt->counter0;
+						reqd->sourceid4=btrpkt->sourceid1;
+						reqd->counter4=btrpkt->counter1;
+						reqd->sourceid5=btrpkt->sourceid2;
+						reqd->counter5=btrpkt->counter2;
+						reqd->sourceid6=btrpkt->sourceid3;
+						reqd->counter6=btrpkt->counter3;
+						reqd->sourceid7=btrpkt->sourceid4;
+						reqd->counter7=btrpkt->counter4;
+					}
+					else if(btrpkt->hopcnt==6){
+						reqd->sourceid3=btrpkt->sourceid0;
+						reqd->counter3=btrpkt->counter0;
+						reqd->sourceid4=btrpkt->sourceid1;
+						reqd->counter4=btrpkt->counter1;
+						reqd->sourceid5=btrpkt->sourceid2;
+						reqd->counter5=btrpkt->counter2;
+						reqd->sourceid6=btrpkt->sourceid3;
+						reqd->counter6=btrpkt->counter3;
+						reqd->sourceid7=btrpkt->sourceid4;
+						reqd->counter7=btrpkt->counter4;
+						reqd->sourceid8=btrpkt->sourceid5;
+						reqd->counter8=btrpkt->counter5;
+					}
+					else if(btrpkt->hopcnt==7){
+						reqd->sourceid3=btrpkt->sourceid0;
+						reqd->counter3=btrpkt->counter0;
+						reqd->sourceid4=btrpkt->sourceid1;
+						reqd->counter4=btrpkt->counter1;
+						reqd->sourceid5=btrpkt->sourceid2;
+						reqd->counter5=btrpkt->counter2;
+						reqd->sourceid6=btrpkt->sourceid3;
+						reqd->counter6=btrpkt->counter3;
+						reqd->sourceid7=btrpkt->sourceid4;
+						reqd->counter7=btrpkt->counter4;
+						reqd->sourceid8=btrpkt->sourceid5;
+						reqd->counter8=btrpkt->counter5;
+						reqd->sourceid9=btrpkt->sourceid6;
+						reqd->counter9=btrpkt->counter6;
+					}
+				}else if(hops==2){//////IF HOPS then IF HOPCNTR
+					if(btrpkt->hopcnt==1){
+						reqd->sourceid2=btrpkt->sourceid0;
+						reqd->counter2=btrpkt->counter0;
+					}
+					else if(btrpkt->hopcnt==2){
+						reqd->sourceid2=btrpkt->sourceid0;
+						reqd->counter2=btrpkt->counter0;
+						reqd->sourceid3=btrpkt->sourceid1;
+						reqd->counter3=btrpkt->counter1;
+					}
+					else if(btrpkt->hopcnt==3){
+						reqd->sourceid2=btrpkt->sourceid0;
+						reqd->counter2=btrpkt->counter0;
+						reqd->sourceid3=btrpkt->sourceid1;
+						reqd->counter3=btrpkt->counter1;
+						reqd->sourceid4=btrpkt->sourceid2;
+						reqd->counter4=btrpkt->counter2;
+					}
+					else if(btrpkt->hopcnt==4){
+						reqd->sourceid2=btrpkt->sourceid0;
+						reqd->counter2=btrpkt->counter0;
+						reqd->sourceid3=btrpkt->sourceid1;
+						reqd->counter3=btrpkt->counter1;
+						reqd->sourceid4=btrpkt->sourceid2;
+						reqd->counter4=btrpkt->counter2;
+						reqd->sourceid5=btrpkt->sourceid3;
+						reqd->counter5=btrpkt->counter3;
+					}
+					else if(btrpkt->hopcnt==5){
+						reqd->sourceid2=btrpkt->sourceid0;
+						reqd->counter2=btrpkt->counter0;
+						reqd->sourceid3=btrpkt->sourceid1;
+						reqd->counter3=btrpkt->counter1;
+						reqd->sourceid4=btrpkt->sourceid2;
+						reqd->counter4=btrpkt->counter2;
+						reqd->sourceid5=btrpkt->sourceid3;
+						reqd->counter5=btrpkt->counter3;
+						reqd->sourceid6=btrpkt->sourceid4;
+						reqd->counter6=btrpkt->counter4;
+					}
+					else if(btrpkt->hopcnt==6){
+						reqd->sourceid2=btrpkt->sourceid0;
+						reqd->counter2=btrpkt->counter0;
+						reqd->sourceid3=btrpkt->sourceid1;
+						reqd->counter3=btrpkt->counter1;
+						reqd->sourceid4=btrpkt->sourceid2;
+						reqd->counter4=btrpkt->counter2;
+						reqd->sourceid5=btrpkt->sourceid3;
+						reqd->counter5=btrpkt->counter3;
+						reqd->sourceid6=btrpkt->sourceid4;
+						reqd->counter6=btrpkt->counter4;
+						reqd->sourceid7=btrpkt->sourceid5;
+						reqd->counter7=btrpkt->counter5;
+					}
+					else if(btrpkt->hopcnt==7){
+						reqd->sourceid2=btrpkt->sourceid0;
+						reqd->counter2=btrpkt->counter0;
+						reqd->sourceid3=btrpkt->sourceid1;
+						reqd->counter3=btrpkt->counter1;
+						reqd->sourceid4=btrpkt->sourceid2;
+						reqd->counter4=btrpkt->counter2;
+						reqd->sourceid5=btrpkt->sourceid3;
+						reqd->counter5=btrpkt->counter3;
+						reqd->sourceid6=btrpkt->sourceid4;
+						reqd->counter6=btrpkt->counter4;
+						reqd->sourceid7=btrpkt->sourceid5;
+						reqd->counter7=btrpkt->counter5;
+						reqd->sourceid8=btrpkt->sourceid6;
+						reqd->counter8=btrpkt->counter6;
+					}
+				}else if(hops==4){//////IF HOPS then IF HOPCNTR
+					if(btrpkt->hopcnt==1){
+						reqd->sourceid4=btrpkt->sourceid0;
+						reqd->counter4=btrpkt->counter0;
+					}
+					else if(btrpkt->hopcnt==2){
+						reqd->sourceid4=btrpkt->sourceid0;
+						reqd->counter4=btrpkt->counter0;
+						reqd->sourceid5=btrpkt->sourceid1;
+						reqd->counter5=btrpkt->counter1;
+					}
+					else if(btrpkt->hopcnt==3){
+						reqd->sourceid4=btrpkt->sourceid0;
+						reqd->counter4=btrpkt->counter0;
+						reqd->sourceid5=btrpkt->sourceid1;
+						reqd->counter5=btrpkt->counter1;
+						reqd->sourceid6=btrpkt->sourceid2;
+						reqd->counter6=btrpkt->counter2;
+					}
+					else if(btrpkt->hopcnt==4){
+						reqd->sourceid4=btrpkt->sourceid0;
+						reqd->counter4=btrpkt->counter0;
+						reqd->sourceid5=btrpkt->sourceid1;
+						reqd->counter5=btrpkt->counter1;
+						reqd->sourceid6=btrpkt->sourceid2;
+						reqd->counter6=btrpkt->counter2;
+						reqd->sourceid7=btrpkt->sourceid3;
+						reqd->counter7=btrpkt->counter3;
+					}
+					else if(btrpkt->hopcnt==5){
+						reqd->sourceid4=btrpkt->sourceid0;
+						reqd->counter4=btrpkt->counter0;
+						reqd->sourceid5=btrpkt->sourceid1;
+						reqd->counter5=btrpkt->counter1;
+						reqd->sourceid6=btrpkt->sourceid2;
+						reqd->counter6=btrpkt->counter2;
+						reqd->sourceid7=btrpkt->sourceid3;
+						reqd->counter7=btrpkt->counter3;
+						reqd->sourceid8=btrpkt->sourceid4;
+						reqd->counter8=btrpkt->counter4;
+					}
+					else if(btrpkt->hopcnt=6){
+						reqd->sourceid4=btrpkt->sourceid0;
+						reqd->counter4=btrpkt->counter0;
+						reqd->sourceid5=btrpkt->sourceid1;
+						reqd->counter5=btrpkt->counter1;
+						reqd->sourceid6=btrpkt->sourceid2;
+						reqd->counter6=btrpkt->counter2;
+						reqd->sourceid7=btrpkt->sourceid3;
+						reqd->counter7=btrpkt->counter3;
+						reqd->sourceid8=btrpkt->sourceid4;
+						reqd->counter8=btrpkt->counter4;
+						reqd->sourceid9=btrpkt->sourceid5;
+						reqd->counter9=btrpkt->counter5;
+					}
+					else if(btrpkt->hopcnt==7){
+						reqd->sourceid4=btrpkt->sourceid0;
+						reqd->counter4=btrpkt->counter0;
+						reqd->sourceid5=btrpkt->sourceid1;
+						reqd->counter5=btrpkt->counter1;
+						reqd->sourceid6=btrpkt->sourceid2;
+						reqd->counter6=btrpkt->counter2;
+						reqd->sourceid7=btrpkt->sourceid3;
+						reqd->counter7=btrpkt->counter3;
+						reqd->sourceid8=btrpkt->sourceid4;
+						reqd->counter8=btrpkt->counter4;
+						reqd->sourceid9=btrpkt->sourceid5;
+						reqd->counter9=btrpkt->counter5;
+						reqd->sourceid10=btrpkt->sourceid6;
+						reqd->counter10=btrpkt->counter6;
+					}
+				}else if(hops==5){
+					for(i=1;i<(btrpkt->hopcnt)+1,i++){
+						switch(i){
+							case(1):reqd->sourceid5=btrpkt->sourceid0;
+								reqd->counter5=btrpkt->counter0;
+								break;
+							case(2):reqd->sourceid6=btrpkt->sourceid1;
+								reqd->counter6=btrpkt->counter1;
+								break;
+							case(3):reqd->sourceid7=btrpkt->sourceid2;
+								reqd->counter7=btrpkt->counter2;
+								break;
+							case(4):reqd->sourceid8=btrpkt->sourceid3;
+								reqd->counter8=btrpkt->counter3;
+								break;
+							case(5):reqd->sourceid9=btrpkt->sourceid4;
+								reqd->counter9=btrpkt->counter4;
+								break;
+							case(6):reqd->sourceid10=btrpkt->sourceid5;
+								reqd->counter10=btrpkt->counter5;
+								break;
+							case(7):reqd->sourceid11=btrpkt->sourceid6;
+								reqd->counter11=btrpkt->counter6;
+								break;
+						}					
+					}
+				}
+				hops=hops+btrpkt->hopcnt;
+				reqd->hopcnt=hops;
+				check=FALSE;
+				printfflush();
+				printf("%u-%u-%u-%u%u%u%u%u%u%u\n",hops,reqd->sourceid0,reqd->sourceid1,reqd->sourceid2,reqd->sourceid3,reqd->sourceid4,reqd->sourceid5,reqd->sourceid6,reqd->sourceid7,reqd->sourceid8);
+			}
+		}
+		return msg;
+	}
+}
