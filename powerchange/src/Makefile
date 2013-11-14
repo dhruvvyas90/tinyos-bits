@@ -1,0 +1,2 @@
+COMPONENT=powerchangeAppC
+include $(MAKERULES)
