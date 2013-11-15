@@ -1,9 +1,13 @@
 #include "Null.h" 
 
-configuration SendAppC {  
+configuration SendAppC { 
 }
 implementation {
+
+	/*This file contains the wires 
+	linking the main module to the hardware*/
 	components MainC;
 	components NullC as App;
+	
 	App.Boot -> MainC;
 }

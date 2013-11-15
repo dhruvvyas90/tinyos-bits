@@ -1,7 +1,6 @@
 #include "Null.h"
 module NullC{
 	uses interface Boot;
-	uses interface Leds;
 }
 implementation{
 	event void Boot.booted(){

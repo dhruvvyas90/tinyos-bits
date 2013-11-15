@@ -5,6 +5,6 @@ enum{
 };
 typedef nx_struct NullCMsg {
 
-} NullCMsg;
+}NullCMsg;
 
 #endif /* Null_H */
