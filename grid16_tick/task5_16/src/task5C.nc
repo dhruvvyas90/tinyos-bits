@@ -1,0 +1,104 @@
+#include <Timer.h>
+#include "task5.h"
+#include "printf.h"
+module task5C{
+	uses interface Boot;
+	uses interface Leds;
+	uses interface Packet;
+	uses interface Timer<TMilli> as Timer0;
+	uses interface AMPacket;
+	uses interface AMSend;
+	uses interface SplitControl as AMControl;
+	uses interface Receive;
+}
+implementation{
+	bool busy=FALSE;
+	message_t pkt;
+	float count;
+	uint8_t cnt;
+	uint8_t cntpdr=0;
+	
+	void printfFloat(uint8_t,uint8_t,float);
+	
+	
+	event void Boot.booted(){
+		// TODO Auto-generated method stub
+		call AMControl.start();
+	}
+
+	event void AMControl.startDone(error_t error){
+		// TODO Auto-generated method stub
+		if(error==SUCCESS){
+		call Timer0.startOneShot(1000);		
+		}else{
+			call AMControl.start();
+		}
+	}
+	
+	event void AMControl.stopDone(error_t error){
+		// TODO Auto-generated method stub
+	}
+
+	event void AMSend.sendDone(message_t *msg, error_t error){
+		// TODO Auto-generated method stub
+		if(error==SUCCESS){
+			busy=FALSE;
+		}
+	}
+	
+	event void Timer0.fired(){
+			if(call AMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof(task5CMsg))==SUCCESS){
+				//call Leds.set(counter);
+				busy=TRUE;
+			}
+	}
+	
+	event message_t * Receive.receive(message_t *msg, void *payload, uint8_t len){
+		// TODO Auto-generated method stub
+	
+		task5CMsg* btrpkt = (task5CMsg*)payload;
+		call Leds.led0Toggle();
+		printfflush();	
+			if(cnt<(btrpkt->counter)){
+				cnt=btrpkt->counter;
+				cntpdr=cntpdr+1;
+			printfflush();
+			//printf("%u%u\n\n",cntpdr,cnt);
+			count=((float)cntpdr/(float)cnt);
+			printfFloat(cntpdr,cnt,count);
+			}
+				
+		//printfflush();
+		//printf("%u%u%u%u%u%u%u%u%u\n\n",btrpkt->hopcnt,btrpkt->sourceid0,btrpkt->sourceid1,btrpkt->sourceid2,btrpkt->sourceid3,btrpkt->sourceid4,btrpkt->sourceid5,btrpkt->sourceid6,btrpkt->sourceid7);
+		return msg;
+	}
+
+void printfFloat(uint8_t a,uint8_t b,float toBePrinted) {
+
+     uint32_t fi, f0, f1, f2;
+     char c;
+     float f = toBePrinted;
+
+     if (f<0){
+       c = '-'; f = -f;
+     } else {
+       c = ' ';
+     }
+
+     // integer portion.
+     fi = (uint32_t) f;
+
+     // decimal portion...get index for up to 3 decimal places.
+     f = f - ((float) fi);
+     f0 = f*10;   f0 %= 10;
+     f1 = f*100;  f1 %= 10;
+     f2 = f*1000; f2 %= 10;
+     printf("%u %u %c%ld.%d%d%d\n\n",a,b,c, fi, (uint8_t) f0, (uint8_t) f1,  
+(uint8_t) f2);
+   }
+
+}
+
+
+
+
