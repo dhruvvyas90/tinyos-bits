@@ -25,7 +25,7 @@ implementation{
 	uint8_t precnt=0;
 	int hops=0;
 	int i=0;
-	int cycle=0;
+	uint8_t cycle=0;
 	
 	event void Boot.booted(){
 			task5CMsg* btrpkt = (task5CMsg*)(call Packet.getPayload(&pkt, sizeof (task5CMsg)));

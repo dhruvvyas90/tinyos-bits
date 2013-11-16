@@ -15,7 +15,7 @@ implementation{
 	bool busy=FALSE;
 	message_t pkt;
 	float count;
-	uint8_t cnt;
+	uint8_t cnt=0;
 	uint8_t cntpdr=0;
 	
 	void printfFloat(uint8_t,uint8_t,float);
@@ -93,7 +93,7 @@ void printfFloat(uint8_t a,uint8_t b,float toBePrinted) {
      f0 = f*10;   f0 %= 10;
      f1 = f*100;  f1 %= 10;
      f2 = f*1000; f2 %= 10;
-     printf("%u %u %c%ld.%d%d%d\n\n",a,b,c, fi, (uint8_t) f0, (uint8_t) f1,  
+     printf("	%u %u %c%ld.%d%d%d\n\n",a,b,c, fi, (uint8_t) f0, (uint8_t) f1,  
 (uint8_t) f2);
    }
 
