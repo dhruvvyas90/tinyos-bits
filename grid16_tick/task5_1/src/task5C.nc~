@@ -74,9 +74,7 @@ implementation{
 	event void Timer0.fired(){
 		task5CMsg* reqd = (task5CMsg*)(call Packet.getPayload(&pkt, sizeof (task5CMsg)));
 		cycle=cycle+1;
-		if(cycle%8==0){
-			call AMControl.start();
-		}else if(cycle%16==0){
+		if(cycle%16==0){
 			counter++;	
 			//if(recd){
 			cycle=0;
@@ -95,6 +93,8 @@ implementation{
 			
 			call AMControl.stop();
 			}
+		}else if(cycle%7==0){
+			call AMControl.start();
 		}
 	//}
 	}

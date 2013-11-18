@@ -61,22 +61,20 @@ implementation{
 
 	event void AMControl.startDone(error_t error){
 		if(error==SUCCESS){
-			call Leds.led1On();
+			call Leds.led0On();
 		}else{
 			call AMControl.start();
 		}
 	}
 
 	event void AMControl.stopDone(error_t error){
-		call Leds.led1Off();
+		call Leds.led0Off();
 	}
 	
 	event void Timer0.fired(){
 		task5CMsg* reqd = (task5CMsg*)(call Packet.getPayload(&pkt, sizeof (task5CMsg)));
 		cycle=cycle+1;
-		if(cycle%10==0){
-			call AMControl.start();
-		}else if(cycle%16==0){
+		if(cycle%16==0){
 			counter++;	
 			//if(recd){
 			cycle=0;
@@ -95,6 +93,8 @@ implementation{
 			
 			call AMControl.stop();
 			}
+		}else if(cycle%7==0){
+			call AMControl.start();
 		}
 	//}
 	}
@@ -133,7 +133,7 @@ implementation{
 		}else{
 			task5CMsg* btrpkt=(task5CMsg*)payload;
 				task5CMsg* reqd = (task5CMsg*)(call Packet.getPayload(&pkt, sizeof (task5CMsg)));
-				call Leds.led0Toggle();
+				call Leds.led1Toggle();
 				recd=TRUE;
 				if(hops==1){//////IF HOPS then IF HOPCNTR
 					for(i=1;i<(btrpkt->hopcnt)+1;i++){
