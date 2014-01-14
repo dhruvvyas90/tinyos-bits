@@ -1,2 +1,0 @@
-COMPONENT=powerchangeAppC
-include $(MAKERULES)
