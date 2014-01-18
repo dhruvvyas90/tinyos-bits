@@ -1,0 +1,8 @@
+if [ ! -z "$1" -a "$1" != "" ]; 
+	then
+	echo "Enter mote number"
+else
+sudo chown shady /dev/ttyUSB0
+echo $1
+make telosb install,$1
+fi

@@ -1,0 +1,11 @@
+if [ "$1" == 0 ]
+	then
+		sudo chown shady /dev/ttyUSB0
+		java net.tinyos.tools.PrintfClient -comm serial@/dev/ttyUSB0:telosb
+elif [ "$1" == 1 ];
+	then
+		sudo chown shady /dev/ttyUSB1
+		java net.tinyos.tools.PrintfClient -comm serial@/dev/ttyUSB1:telosb
+else
+	echo "Enter a parameter 0 or 1"
+fi

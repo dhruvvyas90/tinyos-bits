@@ -1,0 +1,19 @@
+if [ ! -z "$1" -a "$1" != " " ]; 
+	then
+cp -ar ~/tinyos-projects/null $PWD/$1
+base=$1
+sed -i 's/NullAppC/'$base'AppC/g' $PWD/$base/src/Makefile
+sed -i 's/Null_H/'$base'_H/g' $PWD/$base/src/Null.h
+sed -i 's/NullCMsg/'$base'CMsg/g' $PWD/$base/src/Null.h
+sed -i 's/Null/'$base'/g' $PWD/$base/src/NullAppC.nc
+sed -i 's/SendAppC/'$base'AppC/g' $PWD/$base/src/NullAppC.nc
+sed -i 's/NullC/'$base'C/g' $PWD/$base/src/NullAppC.nc
+sed -i 's/Null/'$base'/g' $PWD/$base/src/NullC.nc
+sed -i 's/NullC/'$base'C/g' $PWD/$base/src/NullC.nc
+
+mv $PWD/$base/src/Null.h $PWD/$base/src/$base.h
+mv $PWD/$base/src/NullAppC.nc $PWD/$base/src/$base'AppC'.nc
+mv $PWD/$base/src/NullC.nc $PWD/$base/src/$base'C'.nc
+else
+	echo "Please enter basename as an argument"
+fi

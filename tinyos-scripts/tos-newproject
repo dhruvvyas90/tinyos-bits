@@ -1,0 +1,18 @@
+if [ ! -z "$1" -a "$1" != " " ]; 
+	then
+cp -ar ~/tinyos-projects/basic_send_receive $PWD/$1
+base=$1
+sed -i 's/Send_receiveAppC/'$base'AppC/g' $PWD/$base/src/Makefile
+sed -i 's/Send_receive_H/'$base'_H/g' $PWD/$base/src/Send_receive.h
+sed -i 's/Send_receive/'$base'/g' $PWD/$base/src/Send_receiveAppC.nc
+sed -i 's/Send_receiveAppC/'$base'AppC/g' $PWD/$base/src/Send_receiveAppC.nc
+sed -i 's/Send_receiveC/'$base'C/g' $PWD/$base/src/Send_receiveAppC.nc
+sed -i 's/Send_receive/'$base'/g' $PWD/$base/src/Send_receiveC.nc
+sed -i 's/Send_receiveC/'$base'C/g' $PWD/$base/src/Send_receiveC.nc
+
+mv $PWD/$base/src/Send_receive.h $PWD/$base/src/$base.h
+mv $PWD/$base/src/Send_receiveAppC.nc $PWD/$base/src/$base'AppC'.nc
+mv $PWD/$base/src/Send_receiveC.nc $PWD/$base/src/$base'C'.nc
+else
+	echo "Please enter basename as an argument"
+fi
