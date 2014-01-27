@@ -10,7 +10,7 @@ implementation {
 	components ActiveMessageC;
 	components new AMSenderC(AM_CHANNEL);
 	components new AMReceiverC(AM_CHANNEL);
-  	components HplMsp430InterruptC;
+  	components Msp430TimerC as sensorRead;
   	components SerialPrintfC;
 	components SerialStartC;
 
@@ -22,5 +22,7 @@ implementation {
 	App.AMSend -> AMSenderC;
 	App.AMControl -> ActiveMessageC;
 	App.Receive -> AMReceiverC;
-	App.sensorRead -> HplMsp430InterruptC.Port23; 
+	App.sensorRead -> sensorRead.CaptureA0;
+	App.sensorControl -> sensorRead.ControlA0;
+	App.sensorTimer->sensorRead.TimerA ;
 }
