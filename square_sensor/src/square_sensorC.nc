@@ -50,9 +50,11 @@ implementation{
 		counter=3;
 		}else if(counter == 3)
 		{
+			call sensorTimer.clear();
+			call sensorControl.clearPendingInterrupt();
+			call sensorRead.clearOverflow();
 			call sensorTimer.enableEvents();
 			call sensorControl.enableEvents();
-			call sensorRead.clearOverflow();
 			counter=4;
 		}
 		else{
@@ -81,6 +83,6 @@ implementation{
 		printf("hellloooo");
 	}
 	async event void sensorTimer.overflow(){
-		//printf("helllo");
+		printf("helllo");
 	}
 }
