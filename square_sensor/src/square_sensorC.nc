@@ -46,12 +46,13 @@ implementation{
 	}else if(counter==2){
 		call sensorRead.setEdge(MSP430TIMER_CM_BOTH);
 		call sensorRead.setSynchronous(FALSE);
-		call sensorTimer.clearOverflow();
+		call sensorTimer.clear();
 		counter=3;
 		}else if(counter == 3)
 		{
 			call sensorTimer.enableEvents();
 			call sensorControl.enableEvents();
+			call sensorRead.clearOverflow();
 			counter=4;
 		}
 		else{

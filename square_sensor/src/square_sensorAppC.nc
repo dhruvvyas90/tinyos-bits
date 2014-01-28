@@ -24,5 +24,5 @@ implementation {
 	App.Receive -> AMReceiverC;
 	App.sensorRead -> sensorRead.CaptureA0;
 	App.sensorControl -> sensorRead.ControlA0;
-	App.sensorTimer->sensorRead.TimerA ;
+	App.sensorTimer->sensorRead.TimerA;
 }
