@@ -42,10 +42,16 @@ implementation{
 			msp430_compare_control_t x=call sensorControl.getControl();
 			call sensorControl.setControl(x);
 			counter=1;
+			//printf debug starts
+			printf("Counter is : %d \n",counter);
+			//printf debug ends
 		}
 		if(counter==1)
 		{
 			call sensorControl.setControlAsCapture(MSP430TIMER_CM_BOTH);
+			//printf debug starts
+			printf("Counter is : %d \n",counter);
+			//printf debug ends
 			counter=2;
 		}
 		if(counter==2)
@@ -53,6 +59,9 @@ implementation{
 			call sensorRead.setEdge(MSP430TIMER_CM_BOTH);
 			call sensorRead.setSynchronous(FALSE);
 			call sensorTimer.clear();
+			//printf debug starts
+			printf("Counter is : %d \n",counter);
+			//printf debug ends
 			counter=3;
 		}
 		if(counter == 3)
@@ -62,11 +71,17 @@ implementation{
 			call sensorRead.clearOverflow();
 			call sensorTimer.enableEvents();
 			call sensorControl.enableEvents();
+			//printf debug starts
+			printf("Counter is : %d \n",counter);
+			//printf debug ends
 			counter=4;
 		}
 		if(counter > 3)
 		{
 			//if(==FALSE)
+			//printf debug starts
+			printf("Counter is : %d \n",counter);
+			//printf debug ends
 			printf("%u",call sensorRead.getEvent());
 		}
 		call Leds.led0Toggle();
