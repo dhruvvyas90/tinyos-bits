@@ -35,20 +35,27 @@ implementation{
 	event void AMControl.stopDone(error_t error){
 	}
 		
-	event void Timer0.fired(){
-		if(counter==0){
-		msp430_compare_control_t x=call sensorControl.getControl();
-		call sensorControl.setControl(x);
-		counter=1;
-		}else if(counter==1){
-		call sensorControl.setControlAsCapture(MSP430TIMER_CM_BOTH);
-		counter=2;
-	}else if(counter==2){
-		call sensorRead.setEdge(MSP430TIMER_CM_BOTH);
-		call sensorRead.setSynchronous(FALSE);
-		call sensorTimer.clear();
-		counter=3;
-		}else if(counter == 3)
+	event void Timer0.fired()
+	{
+		if(counter==0)
+		{
+			msp430_compare_control_t x=call sensorControl.getControl();
+			call sensorControl.setControl(x);
+			counter=1;
+		}
+		if(counter==1)
+		{
+			call sensorControl.setControlAsCapture(MSP430TIMER_CM_BOTH);
+			counter=2;
+		}
+		if(counter==2)
+		{
+			call sensorRead.setEdge(MSP430TIMER_CM_BOTH);
+			call sensorRead.setSynchronous(FALSE);
+			call sensorTimer.clear();
+			counter=3;
+		}
+		if(counter == 3)
 		{
 			call sensorTimer.clear();
 			call sensorControl.clearPendingInterrupt();
@@ -57,10 +64,11 @@ implementation{
 			call sensorControl.enableEvents();
 			counter=4;
 		}
-		else{
-		//if(==FALSE)
-		printf("%u",call sensorRead.getEvent());
-	}
+		if(counter > 3)
+		{
+			//if(==FALSE)
+			printf("%u",call sensorRead.getEvent());
+		}
 		call Leds.led0Toggle();
 	}
 	
